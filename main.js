@@ -10,7 +10,7 @@
 
 // a.value = 20
 
-import { Dep, effectWatch, reactive } from './core/index.js'
+// import { Dep, effectWatch, reactive } from './core/index.js'
 
 
 // const a = new Dep(10)
@@ -42,29 +42,10 @@ import { Dep, effectWatch, reactive } from './core/index.js'
 
 
 
-const App = {
-  render(context) {
-    effectWatch(() => {
-      //ui
-      document.querySelector('#app').textContent = ``
-      const element = document.createElement('div')
-      const text = document.createTextNode('nihao')
-      const text1 = document.createTextNode(context.obj.count);
-      element.append(text)
-      element.append(text1)
-      document.querySelector('#app').append(element)
-    })
-  },
 
+// App.render(App.setup())
 
-  setup() {
-    const obj = reactive({
-      count: 1
-    })
-    window.obj = obj
-    return { obj }
-  }
-}
-App.render(App.setup())
+import { createApp } from './core/index.js'
+import App from './App.js'
 
-
+createApp(App).mount(document.querySelector('#app'))
