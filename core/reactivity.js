@@ -44,7 +44,7 @@ const targetMaps = new Map()
 export function reactive(raw) {
   return new Proxy(raw, {
     get(target, key) {
-      console.log(target, key)
+
       let dep = getDep(target, key)
       dep.depend()
       return Reflect.get(target, key)
