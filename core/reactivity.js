@@ -58,6 +58,7 @@ export function reactive(raw) {
 
   })
 }
+
 function getDep(raw, key) {
   let depMap = targetMaps.get(raw)
   if (!depMap) {
