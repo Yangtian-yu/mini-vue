@@ -1,4 +1,5 @@
 import { createCompenentInstance, setupComponent } from "./compenent";
+import { ShapeFlages } from "../shared/ShapeFlages";
 
 export function render(vnode, container) {
   //patch
@@ -14,7 +15,39 @@ function patch(vnode, container) {
   //是element 那么就应该处理element
   //如何区分是element 还是component
   // processElement()
-  processComponent(vnode, container);
+  console.log(vnode.type);
+  const { ShapeFlage } = vnode;
+  if (ShapeFlage & ShapeFlages.ELEMENT) {
+    processElement(vnode, container);
+  } else if (ShapeFlage & ShapeFlages.STATEFUL_COMPONENT) {
+    processComponent(vnode, container);
+  }
+}
+
+function processElement(vnode: any, container: any) {
+  //init
+  mountElement(vnode, container);
+}
+
+function mountElement(vnode, container) {
+  const { children, props, type, ShapeFlage } = vnode;
+  const el = (vnode.el = document.createElement(type));
+
+  if (ShapeFlage & ShapeFlages.TEXT_CHILDREN) {
+    el.textContent = children;
+  } else if (ShapeFlage & ShapeFlages.ARRAY_CHILDREN) {
+    mountChildren(vnode, el);
+  }
+  for (const key in props) {
+    el.setAttribute(key, props[key]);
+  }
+  container.append(el);
+}
+
+function mountChildren(vnode, container) {
+  vnode.children.forEach((v) => {
+    patch(v, container);
+  });
 }
 
 function processComponent(vnode: any, container: any) {
@@ -23,21 +56,24 @@ function processComponent(vnode: any, container: any) {
   moutcomponent(vnode, container);
 }
 
-function moutcomponent(vnode, container) {
+function moutcomponent(initialVNode, container) {
   //vnode->component   container -> querySelect("#app")
   //instance -> {
   //   render()
   //   setup()
   //  }
-  const instance = createCompenentInstance(vnode);
+  const instance = createCompenentInstance(initialVNode);
 
   setupComponent(instance);
-  setupRenderEffect(instance, container);
+  setupRenderEffect(instance, initialVNode, container);
 }
 
-function setupRenderEffect(instance, container) {
-  const subTree = instance.render();
+function setupRenderEffect(instance, initialVNode, container) {
+  const { proxy } = instance;
+  const subTree = instance.render.call(proxy);
   //vnode -> patch
   //vnode -> element -> mountElement
   patch(subTree, container);
+  //element -> mount
+  initialVNode.el = subTree.el;
 }
