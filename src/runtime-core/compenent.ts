@@ -1,7 +1,10 @@
+import { PulicInstancePrioxHandlers } from "./componentPulicInstance";
+
 export function createCompenentInstance(vnode) {
   const component = {
     vnode,
     type: vnode.type,
+    setupState: {},
   };
   return component;
 }
@@ -15,6 +18,10 @@ export function setupComponent(instance) {
 
 function setupStatefulComponent(instance: any) {
   const component = instance.type;
+
+  //ctx
+  instance.proxy = new Proxy({ _: instance }, PulicInstancePrioxHandlers);
+
   const { setup } = component;
   if (setup) {
     //function object
