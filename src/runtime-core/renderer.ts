@@ -39,7 +39,14 @@ function mountElement(vnode, container) {
     mountChildren(vnode, el);
   }
   for (const key in props) {
-    el.setAttribute(key, props[key]);
+    const val = props[key];
+    const isOn = (key: string) => /^on[A-Z]/.test(key);
+    if (isOn(key)) {
+      const event = key.slice(2).toLocaleLowerCase();
+      el.addEventListener(event, val);
+    } else {
+      el.setAttribute(key, val);
+    }
   }
   container.append(el);
 }
