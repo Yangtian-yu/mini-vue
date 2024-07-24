@@ -10,7 +10,10 @@ export const App = {
     window.self = this
     return h("div", {
       id: "root",
-      class: "heard"
+      class: "heard",
+      onClick() {
+        console.log('click')
+      }
     },
 
       //this
