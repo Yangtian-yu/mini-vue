@@ -15,7 +15,6 @@ function patch(vnode, container) {
   //是element 那么就应该处理element
   //如何区分是element 还是component
   // processElement()
-  console.log(vnode.type);
   const { ShapeFlage } = vnode;
   if (ShapeFlage & ShapeFlages.ELEMENT) {
     processElement(vnode, container);
