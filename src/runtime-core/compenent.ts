@@ -33,10 +33,14 @@ function setupStatefulComponent(instance: any) {
 
   const { setup } = component;
   if (setup) {
+    // 设置当前 currentInstance 的值
+    // 必须要在调用 setup 之前
+    setCurrentInstance(instance);
     //function object
     const setupResult = setup(shallowReadonly(instance.props), {
       emit: instance.emit,
     });
+    setCurrentInstance(null);
     handleSetupResult(instance, setupResult);
   }
 }
@@ -53,4 +57,14 @@ function finishComponentSetup(instance: any) {
   const component = instance.type;
 
   instance.render = component.render;
+}
+
+let currentInstance = {};
+// 这个接口暴露给用户，用户可以在 setup 中获取组件实例 instance
+export function getCurrentInstance(): any {
+  return currentInstance;
+}
+
+export function setCurrentInstance(instance) {
+  currentInstance = instance;
 }

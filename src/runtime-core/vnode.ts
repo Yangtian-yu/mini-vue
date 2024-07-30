@@ -1,5 +1,8 @@
 import { ShapeFlages } from "../shared/ShapeFlages";
 
+export const Fragment = Symbol("Fragment");
+export const Text = Symbol("Text");
+
 export function createVNode(type, props?, children?) {
   const vnode = {
     type,
@@ -22,11 +25,14 @@ export function createVNode(type, props?, children?) {
       vnode.ShapeFlage |= ShapeFlages.SLOT_CHILDREN;
     }
   }
-
   return vnode;
 }
 function getShapeFlag(type: any) {
   return typeof type === "string"
     ? ShapeFlages.ELEMENT
     : ShapeFlages.STATEFUL_COMPONENT;
+}
+
+export function createTextVNode(text: string = " ") {
+  return createVNode(Text, {}, text);
 }
