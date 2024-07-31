@@ -9,7 +9,7 @@ export function render(vnode, container) {
   patch(vnode, container);
 }
 
-function patch(vnode, container) {
+function patch(vnode, container, parentComponent = null) {
   //vnode->component   container -> querySelect("#app")
   //去处理组件
   //TODO 判断vnode 是不是一个element
@@ -20,7 +20,7 @@ function patch(vnode, container) {
 
   switch (type) {
     case Fragment:
-      propcessFragment(vnode, container);
+      propcessFragment(vnode, container, parentComponent);
       break;
 
     case Text:
@@ -29,27 +29,27 @@ function patch(vnode, container) {
 
     default:
       if (ShapeFlage & ShapeFlages.ELEMENT) {
-        processElement(vnode, container);
+        processElement(vnode, container, parentComponent);
       } else if (ShapeFlage & ShapeFlages.STATEFUL_COMPONENT) {
-        processComponent(vnode, container);
+        processComponent(vnode, container, parentComponent);
       }
       break;
   }
 }
 
-function processElement(vnode: any, container: any) {
+function processElement(vnode: any, container: any, parentComponent) {
   //init
-  mountElement(vnode, container);
+  mountElement(vnode, container, parentComponent);
 }
 
-function mountElement(vnode, container) {
+function mountElement(vnode, container, parentComponent) {
   const { children, props, type, ShapeFlage } = vnode;
   const el = (vnode.el = document.createElement(type));
 
   if (ShapeFlage & ShapeFlages.TEXT_CHILDREN) {
     el.textContent = children;
   } else if (ShapeFlage & ShapeFlages.ARRAY_CHILDREN) {
-    mountChildren(vnode, el);
+    mountChildren(vnode, el, parentComponent);
   }
   for (const key in props) {
     const val = props[key];
@@ -64,25 +64,25 @@ function mountElement(vnode, container) {
   container.append(el);
 }
 
-function mountChildren(vnode, container) {
+function mountChildren(vnode, container, parentComponent) {
   vnode.children.forEach((v) => {
-    patch(v, container);
+    patch(v, container, parentComponent);
   });
 }
 
-function processComponent(vnode: any, container: any) {
+function processComponent(vnode: any, container: any, parentComponent) {
   //vnode->component   container -> querySelect("#app")
   //挂载组件
-  moutcomponent(vnode, container);
+  moutcomponent(vnode, container, parentComponent);
 }
 
-function moutcomponent(initialVNode, container) {
+function moutcomponent(initialVNode, container, parentComponent) {
   //vnode->component   container -> querySelect("#app")
   //instance -> {
   //   render()
   //   setup()
   //  }
-  const instance = createCompenentInstance(initialVNode);
+  const instance = createCompenentInstance(initialVNode, parentComponent);
 
   setupComponent(instance);
   setupRenderEffect(instance, initialVNode, container);
@@ -93,13 +93,13 @@ function setupRenderEffect(instance, initialVNode, container) {
   const subTree = instance.render.call(proxy);
   //vnode -> patch
   //vnode -> element -> mountElement
-  patch(subTree, container);
+  patch(subTree, container, instance);
   //element -> mount
   initialVNode.el = subTree.el;
 }
 
-function propcessFragment(vnode: any, container: any) {
-  mountChildren(vnode, container);
+function propcessFragment(vnode: any, container: any, parentComponent) {
+  mountChildren(vnode, container, parentComponent);
 }
 
 function propcessText(vnode: any, container: any) {
